@@ -1,0 +1,23 @@
+# Ekip içi notlar — repoya girmez
+Ekip_Ici_Calisma_Plani.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Veritabanı ve ortam dosyaları
+*.db
+*.sqlite3
+.env
+
+# Editör / işletim sistemi
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
