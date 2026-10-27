@@ -3,8 +3,8 @@
 - **Proje Adı:** ServisFlow — Araç Bazlı Servis İş Takibi ve Dönemsel Brüt İş Bedeli Raporlama
 - **Ders:** Yazılım Kalite Standartları
 - **Ekip Büyüklüğü:** 7 kişi
-- **Doküman Durumu:** Taslak v0.4 — ekip ve öğretim elemanı onayı bekleniyor
-- **Hazırlanma Tarihi:** 22.10.2026 · **Son güncelleme:** 24.10.2026
+- **Doküman Durumu:** v1.0 — ekip tarafından onaylandı, öğretim elemanı onayı bekleniyor
+- **Hazırlanma Tarihi:** 22.10.2026 · **Son güncelleme:** 27.10.2026
 
 > **Kapsam kararı (v0.4):** v0.3 taslağındaki stok yönetimi, parça bazlı fiyat satırları, üç rollü yetki matrisi, iş emri durum makinesi ve audit log, ders süresi içinde **her özelliği test edilmiş ve ölçülmüş biçimde teslim edebilmek** amacıyla kapsamdan çıkarılmıştır. Proje, araç bazlı **To-Do tarzı iş takibi** ve **tamamlanma tarihine dayalı dönemsel raporlama** çekirdeğine indirgenmiştir. Bu karar, kalite yönetiminde bilinen *“kapsamı sınırla, derinliği artır”* ilkesine dayanır: daha az özellik, daha yüksek test kapsamı ve daha düşük teknik risk.
 
@@ -356,11 +356,14 @@ Toplam bir “sayaç” olarak tutulmaz, **her seferinde sorgudan hesaplanır**.
 
 ### 4.1. Ekipçe Yapılması Gereken Doğrulamalar
 
+- [x] Proje adı ve daraltılmış kapsam ekip toplantısında onaylandı.
 - [ ] Proje adı ve daraltılmış kapsam ders hocasıyla kesinleştirildi.
-- [ ] Yedi üyenin öğrenci numaraları ve use case atamaları onaylandı.
-- [ ] İş kuralları (BR-01 – BR-08) ekipçe okundu ve onaylandı.
-- [ ] Kalite hedefleri (kapsama, McCabe, bandit) kabul edildi.
-- [ ] GitHub reposu ve proje panosu oluşturuldu.
+- [x] Use case atamaları onaylandı.
+- [ ] Yedi üyenin öğrenci numaraları toplandı (6/7).
+- [x] İş kuralları (BR-01 – BR-08) ekipçe okundu ve onaylandı.
+- [x] Kalite hedefleri (kapsama, McCabe, bandit) kabul edildi.
+- [x] GitHub reposu oluşturuldu: <https://github.com/servisflow/servisflow>
+- [ ] GitHub Projects panosu oluşturuldu.
 - [ ] DIR puanları dersin resmi yöntemine göre verildi.
 
 ---
@@ -378,4 +381,4 @@ Toplam bir “sayaç” olarak tutulmaz, **her seferinde sorgudan hesaplanır**.
 
 ---
 
-**Doküman notu:** Bu içerik **Faz 1 taslağıdır**. Faz 2 test planı ve risk analizi, Faz 3 mimari/kod kanıtları ve Faz 4 ölçüm sonuçları henüz üretilmediğinden sonuç olarak sunulmamıştır. Final raporu tüm fazları ve kaynakçayı kapsayacak şekilde **20 sayfayı aşmayacaktır**.
+**Doküman notu:** Bu içerik **Faz 1 çıktısıdır**. Faz 2 test planı ve risk analizi, Faz 3 mimari/kod kanıtları ve Faz 4 ölçüm sonuçları henüz üretilmediğinden sonuç olarak sunulmamıştır. Final raporu tüm fazları ve kaynakçayı kapsayacak şekilde **20 sayfayı aşmayacaktır**.
