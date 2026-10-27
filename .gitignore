@@ -21,3 +21,6 @@ htmlcov/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Hocaya teslim edilen, öğrenci numarası içeren dosyalar — repoya girmez
+teslim/
