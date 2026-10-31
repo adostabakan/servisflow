@@ -1,0 +1,21 @@
+[project]
+name = "servisflow"
+version = "0.1.0"
+description = "Araç bazlı servis iş takibi ve dönemsel brüt iş bedeli raporlama"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["src/servisflow"]
+omit = ["src/servisflow/ui/*"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]

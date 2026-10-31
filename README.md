@@ -1,7 +1,7 @@
 # ServisFlow — Araç Bazlı Servis İş Takibi ve Dönemsel Brüt İş Bedeli Raporlama
 
 > **Durum:** Faz 1 tamamlandı — ekip tarafından onaylandı, öğretim elemanı onayı bekleniyor.  
-> **Ders:** Yazılım Kalite Standartları · **Ekip:** 7 kişi · **Sürüm:** v1.0 (27.10.2026)
+> **Ders:** Yazılım Kalite Standartları · **Ekip:** 7 kişi · **Sürüm:** v1.1 (31.10.2026)
 
 **ServisFlow**, küçük bir oto serviste her araç için **To-Do uygulaması mantığında yapılacak işler listesi** tutan, işler **✓** ile tamamlandığında tutarlarını tamamlanma gününe yazan ve **günlük / haftalık / aylık / yıllık brüt iş bedelini** raporlayan sade bir web uygulamasıdır.
 
@@ -98,6 +98,7 @@ Stok/envanter, parça bazlı fiyat satırları, çoklu rol ve yetki matrisi, öd
 | Karmaşıklık | radon (McCabe) |
 | Stil / statik analiz | black / flake8 |
 | Güvenlik taraması | bandit |
+| Karmaşıklık eşiği (CI) | xenon (radon tabanlı) |
 | Süreç | GitHub Projects (Scrumban), PR + code review, GitHub Actions (CI) |
 
 **Mimari:** Katmanlı monolit — `ui` (Streamlit ekranları) → `services` (iş kuralları, arayüzden bağımsız ve test edilebilir) → `repository` (veritabanı erişimi).
@@ -117,24 +118,47 @@ servisflow/
 │   ├── services/      # İş kuralları (UC mantığı)
 │   └── repository/    # SQLAlchemy modelleri ve sorgular
 ├── tests/             # pytest birim ve entegrasyon testleri
-└── .github/workflows/ # CI: test + coverage + radon + bandit
+├── pyproject.toml     # pytest, coverage ve black ayarları
+├── .flake8            # flake8 ayarları
+├── requirements.txt / requirements-dev.txt
+└── .github/workflows/ # CI: black + flake8 + bandit + radon/xenon + pytest-cov
 ```
 
 ## 🚀 Kurulum
 
-**Henüz çalışan kod yoktur** (Faz 1 dokümantasyon aşaması). Geliştirme başladığında kurulum ve test komutları buraya eklenecektir.
+Uygulama kodu Faz 3'te yazılacaktır. Geliştirme ortamı ve kalite kapıları şimdiden kuruludur.
+
+```bash
+git clone https://github.com/servisflow/servisflow.git
+cd servisflow
+python -m venv .venv
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+Kalite kapılarını yerelde çalıştırma (CI'daki adımların aynısı):
+
+```bash
+black --check src tests                                  # biçim
+flake8 src tests                                         # stil
+bandit -r src --severity-level high                      # güvenlik
+xenon src --max-absolute B --max-modules B --max-average A   # McCabe ≤ 10
+pytest --cov                                             # testler + kapsama ≥ %80
+```
+
+Her push ve pull request'te bu adımlar [GitHub Actions](.github/workflows/ci.yml) tarafından otomatik çalıştırılır.
 
 📄 Faz 1 raporu: [`docs/Faz1_Raporu.md`](docs/Faz1_Raporu.md)
 
 ## 🗓️ Ders fazları
 
-| Faz | Beklenen çıktı |
-| :--- | :--- |
-| **1** | Ekip, kapsam, teknoloji, süreç, 7 use case, gereksinimler |
-| **2** | Faz 1 review, test planı, kalite kapıları, risk değerlendirmesi |
-| **3** | Mimari ve teknik kararlar, kodlama, code review |
-| **4** | Kara/beyaz kutu, kullanıcı testleri, McCabe, deployment |
-| **5** | En fazla 20 sayfalık final raporu, DIR, kaynakça ve demo |
+| Faz | Teslim | Beklenen çıktı |
+| :--- | :--- | :--- |
+| **1** | Hafta 4 | Ekip, kapsam, teknoloji, ortamlar, süreç, 7 use case, gereksinimler |
+| **2** | Hafta 7 | Faz 1 review, test planı, kalite kapıları, risk değerlendirmesi |
+| **3** | Hafta 9 | Mimari ve teknik kararlar, kodlama, code review |
+| **4** | Hafta 12 | Kara/beyaz kutu, kullanıcı testleri, McCabe, deployment |
+| **5** | Hafta 14 | En fazla 20 sayfalık final raporu, DIR, kaynakça ve demo |
 
 ## 🤖 DIR ve kaynaklar
 

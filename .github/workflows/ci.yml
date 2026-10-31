@@ -1,0 +1,38 @@
+name: CI — Kalite Kapıları
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  kalite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Bağımlılıkları kur
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Biçim denetimi (black)
+        run: black --check src tests
+
+      - name: Stil denetimi (flake8)
+        run: flake8 src tests
+
+      - name: Güvenlik taraması (bandit, yüksek önem = 0)
+        run: bandit -r src --severity-level high
+
+      - name: McCabe karmaşıklığı (fonksiyon başına ≤ 10)
+        run: |
+          radon cc src -s -a
+          xenon src --max-absolute B --max-modules B --max-average A
+
+      - name: Testler ve kapsama (≥ %80)
+        run: pytest --cov --cov-report=term-missing

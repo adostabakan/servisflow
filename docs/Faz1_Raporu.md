@@ -3,8 +3,8 @@
 - **Proje Adı:** ServisFlow — Araç Bazlı Servis İş Takibi ve Dönemsel Brüt İş Bedeli Raporlama
 - **Ders:** Yazılım Kalite Standartları
 - **Ekip Büyüklüğü:** 7 kişi
-- **Doküman Durumu:** v1.0 — ekip tarafından onaylandı, öğretim elemanı onayı bekleniyor
-- **Hazırlanma Tarihi:** 22.10.2026 · **Son güncelleme:** 27.10.2026
+- **Doküman Durumu:** v1.1 — ekip tarafından onaylandı, öğretim elemanı onayı bekleniyor
+- **Hazırlanma Tarihi:** 22.10.2026 · **Son güncelleme:** 31.10.2026
 
 > **Kapsam kararı (v0.4):** v0.3 taslağındaki stok yönetimi, parça bazlı fiyat satırları, üç rollü yetki matrisi, iş emri durum makinesi ve audit log, ders süresi içinde **her özelliği test edilmiş ve ölçülmüş biçimde teslim edebilmek** amacıyla kapsamdan çıkarılmıştır. Proje, araç bazlı **To-Do tarzı iş takibi** ve **tamamlanma tarihine dayalı dönemsel raporlama** çekirdeğine indirgenmiştir. Bu karar, kalite yönetiminde bilinen *“kapsamı sınırla, derinliği artır”* ilkesine dayanır: daha az özellik, daha yüksek test kapsamı ve daha düşük teknik risk.
 
@@ -38,7 +38,7 @@ Yönergede ekiplerin **6 veya 7 kişi** olması ve her üyenin **en az bir use c
 | Veritabanı / ORM | SQLite / SQLAlchemy | Tek şube senaryosu için yeterli; ORM parametreli sorgu ile SQL enjeksiyonunu önler |
 | Parola güvenliği | Argon2id (`argon2-cffi`) | OWASP'ın önerdiği modern parola özetleme algoritması |
 | Test | pytest / pytest-cov | Birim, entegrasyon, sınır değer testleri ve kapsama ölçümü |
-| Karmaşıklık | radon | McCabe döngüsel karmaşıklık ölçümü |
+| Karmaşıklık | radon / xenon | McCabe döngüsel karmaşıklık ölçümü; xenon eşik aşıldığında CI'ı durdurur |
 | Stil / statik analiz | black / flake8 | PEP 8 uyumlu, tutarlı kod |
 | Güvenlik taraması | bandit | Python statik güvenlik analizi |
 | Sürüm kontrol | Git / GitHub | PR ve kod incelemesinin izlenebilirliği |
@@ -65,17 +65,33 @@ repository/  → SQLAlchemy modelleri ve sorgular
 5. **İzlenebilirlik:** `FR → UC → GitHub Issue → PR → Test senaryosu` zinciri korunur.
 6. **Veri gizliliği:** Demo ve testlerde yalnızca sentetik veri kullanılır.
 
-### 2.3. Fazlara Göre Planlanan Çıktılar
+### 2.3. Geliştirme Ortamı
 
-| Faz | Dönem | Beklenen çıktılar | Koordinasyon |
-| :--- | :--- | :--- | :--- |
-| **Faz 1** | Hafta 1–3 | Ekip, roller, teknoloji, kapsam, FR/NFR, 7 use case | Üye 7 + Üye 2 |
-| **Faz 2** | Hafta 4–6 | Faz 1 review, test planı, kalite kapıları, risk değerlendirmesi | Üye 7 + Üye 5 |
-| **Faz 3** | Hafta 7–9 | Mimari kararlar, kodlama, code review | Üye 5–7 + tüm ekip |
-| **Faz 4** | Hafta 10–12 | Kara/beyaz kutu ve kullanıcı testleri, McCabe, deployment | Üye 6–7 + tüm ekip |
-| **Faz 5** | Hafta 13–14 | Nihai rapor (≤ 20 sayfa), DIR beyanları, demo | Üye 7 + Üye 4 + tüm ekip |
+Faz 1'in “ortamların oluşturulması” çıktısı kapsamında aşağıdaki ortam kurulmuş ve çalıştırılarak doğrulanmıştır:
 
-> Haftalar taslaktır; kesin teslim tarihleri ders izlencesiyle eşleştirilecektir.
+| Bileşen | Durum |
+| :--- | :--- |
+| **Kod deposu** | <https://github.com/servisflow/servisflow> (herkese açık, `servisflow` GitHub organizasyonu) |
+| **Klasör yapısı** | `src/servisflow/{ui, services, repository}` katmanları, `tests/`, `docs/` |
+| **Bağımlılıklar** | `requirements.txt` (uygulama), `requirements-dev.txt` (kalite araçları), sürümler sabitlenmiş |
+| **Araç ayarları** | `pyproject.toml` (pytest, coverage ≥ %80, black), `.flake8` |
+| **CI** | `.github/workflows/ci.yml`: her push ve PR'da black → flake8 → bandit (yüksek önem) → radon/xenon (McCabe ≤ 10) → pytest + kapsama |
+| **Ortam testi** | `tests/test_smoke.py`: paketin ve üç katmanın içe aktarılabildiğini doğrular |
+| **İş takibi** | GitHub Projects panosu — `[kurulacak]` |
+
+**Kurulum ve test:** `pip install -r requirements.txt -r requirements-dev.txt` ardından `pytest --cov`. Tüm komutlar README'nin “Kurulum” bölümündedir.
+
+### 2.4. Fazlara Göre Planlanan Çıktılar
+
+| Faz | Not ağırlığı | Çalışma dönemi | Teslim (izlence) | Beklenen çıktılar | Koordinasyon |
+| :--- | :---: | :--- | :--- | :--- | :--- |
+| **Faz 1** | %5 | Hafta 2–4 | **Hafta 4** | Ekip, roller, teknoloji, ortamlar, kapsam, FR/NFR, 7 use case | Üye 7 + Üye 2 |
+| **Faz 2** | %5 | Hafta 5–7 | **Hafta 7** | Faz 1 review, test planı, kalite kapıları, risk değerlendirmesi | Üye 7 + Üye 5 |
+| **Faz 3** | %10 | Hafta 8–9 | **Hafta 9** | Mimari kararlar, kodlama, code review | Üye 5–7 + tüm ekip |
+| **Faz 4** | %10 | Hafta 10–12 | **Hafta 12** | Kara/beyaz kutu ve kullanıcı testleri, McCabe, deployment | Üye 6–7 + tüm ekip |
+| **Faz 5** | — | Hafta 13–14 | **Hafta 14** | Nihai rapor (≤ 20 sayfa), DIR beyanları, demo, öğrenilen dersler | Üye 7 + Üye 4 + tüm ekip |
+
+> Teslim haftaları YAZ401 ders izlencesinden alınmıştır. Faz 3'ün çalışma süresi vize haftalarıyla (Hafta 8–9) çakıştığından kodlama iskeleti Faz 2 sırasında hazırlanacaktır.
 
 ---
 
@@ -338,23 +354,63 @@ Toplam bir “sayaç” olarak tutulmaz, **her seferinde sorgudan hesaplanır**.
 
 ---
 
-## 4. Faz 1 İçin DIR Yöntemi ile Yapay Zekâ Kullanım Beyanı (Taslak)
+## 4. Faz 1 İçin DIR Yöntemi ile Yapay Zekâ Kullanım Beyanı
 
-> Bu bölüm **gerçekte yapılmış** YZ kullanımını beyan eder. Dersin DIR puanlama yöntemi ekipçe teyit edilerek puanlar sonra girilecektir.
+> Beyan, dersin **İSTÜN DIR Rehberi (V2)** ve **Yapay Zekâ Kullanım Beyanı Şablonu** esas alınarak hazırlanmıştır. Puanlar boyut derecelendirmelerine göre ekip tarafından verilir: **DIR = Floor(0,8 × D × I × R)**. Bu bölüm yalnızca **gerçekleşmiş** kullanımı ve **gerçekleşmiş** doğrulamaları anlatır. Yapılmamış işlemler eksiklik olarak belirtilmiştir.
 
-| Tarih | YZ aracı | Görev |
-| :--- | :--- | :--- |
-| 22.10.2026 | OpenAI ChatGPT | Q-Task formatı esas alınarak README ve Faz 1 raporunun v0.3 taslağının oluşturulması |
-| 24.10.2026 | Anthropic Claude (Claude Code) | Ekip kararıyla kapsamın daraltılması doğrultusunda v0.4 revizyonu: stok/rol/audit çıkarılması, use case'lerin yeniden tanımlanması, iş kuralları, ISO/IEC 25010 eşlemesi, test senaryoları, risk listesi |
+**Görevin YZ kullanım sınırı:** Ders yönergesi analiz, tasarım, test ve dokümantasyon dahil tüm aşamalarda YZ kullanımına izin verir (Göreve Özgü YZ Kullanım Sınırları: teknik dokümantasyon → *Yeşil*). Proje fikri, kapsam kararları ve görev dağılımı ise ekibe aittir ve YZ'ye devredilmemiştir.
 
-| DIR boyutu | Gerçekleşen kullanım / insan denetimi | Puan |
-| :--- | :--- | :--- |
-| **D — Discover / Keşfet** | Ekip, proje türünü ve kaynak formatı belirledi; ders yönergesindeki 7 üye ve kişi başı use case koşulları dikkate alındı. Kapsam daraltma kararı ekip tarafından verildi. | `[Eklenecek]` |
-| **I — Interact / Etkileş** | YZ, ekip isteklerine göre taslak ve revizyon önerileri üretti; ekip kapsam sınırlarını (stok yok, To-Do mantığı, dar MVP) yönlendirdi. | `[Eklenecek]` |
-| **R — Review / Gözden Geçir** | **Bekliyor:** Ekip; use case'leri, iş kurallarını, test senaryolarını ve kaynakları gözden geçirecektir. | `[Eklenecek]` |
-| **DIR nihai skor** | Henüz hesaplanmadı. | `[Bekliyor]` |
+### 4.1. İş Paketi 1 — Faz 1 Belgelerinin İlk Taslağı (v0.1–v0.3)
 
-### 4.1. Ekipçe Yapılması Gereken Doğrulamalar
+| Alan | İçerik |
+| :--- | :--- |
+| **Tarih** | 22.10.2026 |
+| **YZ aracı** | OpenAI ChatGPT (GPT-6) |
+| **İlgili üyeler** | `[Taslağı hazırlayan üye(ler) yazılacak]` |
+| **Üretilen çıktı** | README ve Faz 1 raporu taslağı (v0.3) |
+
+**Süreç özeti:** YZ'ye ders yönergesindeki Faz 1 maddeleri, 7 kişilik ekip ve kişi başı en az bir use case koşulu, proje türü (araç servis yönetimi) ve biçim örneği olarak önceki Q-Task deposu verildi. İlk taslağın ardından iki ek turda stok kartı ve minimum stok uyarısı ile günlük/dönemsel brüt iş bedeli istendi. Sonra işlerin To-Do mantığında ✓ ile tamamlanması ve tamamlanma tarihine göre raporlanması tarif edildi; taslak her turda bu girdilere göre revize edildi.
+
+| Boyut | Puan | Kontrol listesi dayanaklı gerekçe |
+| :--- | :---: | :--- |
+| **D** | 3 | Görev, artifact türü ve biçim örneği tanımlandı (A1, A2); ders ve ekip bağlamı verildi (A3). Ne yapılmaması gerektiğine dair açık kısıt verilmedi, kabul kriterleri yazılı değildi (A4, A6 eksik). Proje fikri ekipte kaldı (A8). |
+| **I** | 4 | Üç tur anlamlı yönlendirme yapıldı: stok, dönemsel rapor ve To-Do akışı eklendi (B1, B2). Alternatif model karşılaştırılmadı (B4 eksik). |
+| **R** | 3 | Çekirdek ekip toplantısında taslak incelendi; kapsamın ders süresine göre fazla geniş olduğu tespit edilerek stok, çoklu rol, audit log ve parça satırları reddedildi (C5 kısmen). Kaynakların birincil kaynaktan doğrulanması bu sürümde yapılmadı (C1 eksik). Kod yok; C3 uygulanamaz. |
+
+**Skor:** D = 3, I = 4, R = 3 → DIR = Floor(0,8 × 36) = **28** → **Bant 2 (Yüzeysel ve Temel Sorumluluk)**. Bantın düşük kalmasının nedeni, ilk taslakta negatif yönergelerin ve kabul kriterlerinin tanımlanmamış olmasıdır. Bu eksiklik İş Paketi 2'de giderilmiştir.
+
+### 4.2. İş Paketi 2 — Kapsam Daraltma Revizyonu ve Faz 1 v1.0 (v0.4–v1.0)
+
+| Alan | İçerik |
+| :--- | :--- |
+| **Tarih** | 24.10.2026 – 31.10.2026 |
+| **YZ aracı** | Anthropic Claude (Claude Code, ajan tabanlı; proje klasörü ve GitHub üzerinde dosya düzenleme yetkisiyle) |
+| **İlgili üyeler** | Ahmet Selim Dostabakan (yönlendirme); Ahmet Selim Dostabakan, Kerem Erden, Mehmet Ünsalan (ekip toplantısında gözden geçirme ve onay) |
+| **Üretilen çıktı** | README ve Faz 1 raporu v0.4–v1.0, sunum notları, GitHub deposu, geliştirme ortamı iskeleti |
+
+**Süreç özeti:** YZ'ye v0.3 belgeleri, ekip kararı olan daraltılmış kapsam (stok yok, yalnızca araç bazlı To-Do takibi, çok dar MVP), sınıfta sözlü sunum yapılacağı bilgisi ve use case adlarının içerikle tutarlı biçimde açıklayıcı olması beklentisi verildi. YZ'nin ürettiği revizyon; use case dağılımı, iş kuralları, test senaryoları ve kaynaklar açısından turlar halinde yeniden yönlendirildi. Depo görünürlüğü, öğrenci numaralarının nerede tutulacağı ve ekip liderliği gibi kararlar insan tarafından verildi; YZ'nin bu konudaki önerileri seçenek olarak sunuldu.
+
+| Boyut | Puan | Kontrol listesi dayanaklı gerekçe |
+| :--- | :---: | :--- |
+| **D** | 4 | Görev, çıktı biçimi, hedef kitle (hoca ve sınıf) ve sunum bağlamı verildi (A1, A2, A3). Negatif yönergeler açıkça belirtildi: stok yok, MVP çok dar tutulacak, yapılmamış test yapılmış gibi gösterilmeyecek, ekip içi plan herkese açık depoya konmayacak (A4). Dosyalara ve GitHub'a doğrudan erişebilen bir ajan aracı bilinçli olarak seçildi (A5). Kapsam, use case dağılımı ve depo görünürlüğü kararları insanda kaldı (A8). Ajanın uzak depo ayarını değiştirme denemesi izin sistemi tarafından durduruldu (A9). **Sınırlılık:** Ekip üyelerinin öğrenci numaraları, teslim belgesine işlenmesi için YZ aracına iletildi. Numaralar herkese açık depoya konmadı, ancak A7 açısından bu bir eksikliktir. Sonraki fazlarda kişisel veri YZ'ye verilmeyecek, teslim belgesine elle eklenecektir. |
+| **I** | 4 | İlk revizyon incelendi ve çok turlu yönlendirme yapıldı: kapsam daraltma, use case adları, use case'lerin yeniden dağıtımı, mesaj biçimi (B1, B2). YZ'nin depoyu gizli yapma önerisi değerlendirilip herkese açık seçildi. Öğrenci numaralarının depoya konmasına yönelik akış durdurularak ayrı teslim kopyasına yönlendirildi (B3). Kalıcı işlemler insan onayına bağlandı: depo görünürlüğü, push, liderlik değişikliği (B6). Farklı modeller yan yana karşılaştırılmadı (B4 eksik). |
+| **R** | 3 | Kapsam, iş kuralları ve kalite hedefleri ekip toplantısında incelenip onaylandı (C5). Ajanın “gönderildi” bildirimleri GitHub'daki commit ve dosya listesiyle karşılaştırıldı; depo taşıma sonrası adres değişikliği fark edildi (C4, C7). **Eksik:** ISO/IEC standartları, OWASP ve McCabe kaynakları ekip tarafından birincil kaynağından henüz açılıp doğrulanmadı (C1). İş kuralları gerçek bir servis çalışanıyla teyit edilmedi. Kod yok; C3 uygulanamaz. |
+
+**Skor:** D = 4, I = 4, R = 3 → DIR = Floor(0,8 × 48) = **38** → **Bant 3 (Etkin ve Dengeli Yönetişim)**.
+
+**R'yi 4'e çıkarmak için planlanan işlemler (Faz 2 review kapsamında):** Kaynakçadaki her standart ve makale birincil kaynağından açılıp künyesi kontrol edilecek. BR-01 – BR-08 kuralları bir servis çalışanına okutulacak. Her üye kendi use case'ini sözlü olarak savunabilecek düzeyde inceleyecek (C6). Bu işlemler gerçekleşirse skor D = 4, I = 4, R = 4 → **51** olarak güncellenecektir.
+
+### 4.3. Özet Beyan Tablosu
+
+| Üretilen artifact & YZ aracı | Kullanım amacı | İnsan müdahalesi ve düzeltme | Doğrulama yöntemi |
+| :--- | :--- | :--- | :--- |
+| README + Faz 1 v0.3 / ChatGPT | Doküman taslağı | Stok, dönemsel rapor ve To-Do akışı eklettirildi; sonra geniş kapsam ekipçe reddedildi | Ekip toplantısında kapsam incelemesi |
+| Faz 1 v0.4–v1.0, sunum notları / Claude Code | Kapsam daraltma revizyonu, gereksinim ve test senaryosu yapılandırma | Use case dağılımı ve adları insan kararıyla değiştirildi; kişisel veri depodan uzak tutuldu | Ekip onayı; GitHub üzerinde commit kontrolü |
+| Geliştirme ortamı iskeleti / Claude Code | CI ve araç yapılandırması | Kalite eşikleri (kapsama, McCabe, bandit) ekip hedeflerinden alındı | Araçlar yerelde çalıştırıldı; CI sonucu GitHub Actions'ta kontrol edildi |
+
+> **Öğrenme soruları ve taahhütname:** Rehber gereği her üye kendi adına öğrenme sorularını yanıtlar ve taahhütnameyi imzalar. Bunlar teslim belgesine kişi bazında eklenecektir.
+
+### 4.4. Ekipçe Yapılması Gereken Doğrulamalar
 
 - [x] Proje adı ve daraltılmış kapsam ekip toplantısında onaylandı.
 - [ ] Proje adı ve daraltılmış kapsam ders hocasıyla kesinleştirildi.
@@ -364,7 +420,9 @@ Toplam bir “sayaç” olarak tutulmaz, **her seferinde sorgudan hesaplanır**.
 - [x] Kalite hedefleri (kapsama, McCabe, bandit) kabul edildi.
 - [x] GitHub reposu oluşturuldu: <https://github.com/servisflow/servisflow>
 - [ ] GitHub Projects panosu oluşturuldu.
-- [ ] DIR puanları dersin resmi yöntemine göre verildi.
+- [x] Geliştirme ortamı ve CI iskeleti kuruldu (Bölüm 2.3).
+- [x] DIR puanları dersin resmi yöntemine (İSTÜN DIR Rehberi V2) göre verildi.
+- [ ] Her üye DIR öğrenme sorularını yanıtladı ve taahhütnameyi imzaladı.
 
 ---
 
@@ -377,7 +435,9 @@ Toplam bir “sayaç” olarak tutulmaz, **her seferinde sorgudan hesaplanır**.
 5. **OWASP Password Storage Cheat Sheet**, parola özetleme yöntemi seçimi (Argon2id).
 6. **McCabe, T. J. (1976).** *A Complexity Measure.* IEEE Transactions on Software Engineering, SE-2(4), 308–320.
 7. **Q-Task: Kurumsal Görev, Kalite ve SLA Takip Sistemi**, biçim örneği, [GitHub](https://github.com/alperhank/q-task-quality-system) (erişim: 22.10.2026).
-8. **OpenAI ChatGPT** (22.10.2026) ve **Anthropic Claude** (24.10.2026); kullanım Bölüm 4'te beyan edilmiştir.
+8. **OpenAI ChatGPT** (22.10.2026) ve **Anthropic Claude — Claude Code** (24–31.10.2026); kullanım Bölüm 4'te beyan edilmiştir.
+9. **Bağrıyanık, S.** *Yükseköğretimde Sorumlu Yapay Zekâ Kullanımına Dair Bir Öneri: DIR Çerçevesi* (İSTÜN DIR Rehberi V2) ve *Yapay Zekâ Kullanım Beyanı Şablonu*, ders materyali, İstanbul Sağlık ve Teknoloji Üniversitesi, 2026.
+10. **YAZ401 Yazılım Kalite Standartları Ders İzlencesi**, İstanbul Sağlık ve Teknoloji Üniversitesi, 2026–2027 Güz. Teslim haftaları buradan alınmıştır.
 
 ---
 
